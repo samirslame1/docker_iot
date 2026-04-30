@@ -3,8 +3,8 @@ services:
     build: ./clienteMqtt/
     container_name: firstcontainer
     environment:
-      - direccionbroker=value
-      - topicoS=value
-      - topicoS1=value
-      - topicoP=value
+      - direccionbroker=fiounam.duckdns.org
+      - topicoS=festichola
+      - topicoS1=after
+      - topicoP=contadorAI
     restart: always
