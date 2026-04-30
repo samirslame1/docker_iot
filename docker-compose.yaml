@@ -1,0 +1,10 @@
+services:
+  firstservice:
+    build: ./clienteMqtt/
+    container_name: firstcontainer
+    environment:
+      - direccionbroker=value
+      - topicoS=value
+      - topicoS1=value
+      - topicoP=value
+    restart: always
