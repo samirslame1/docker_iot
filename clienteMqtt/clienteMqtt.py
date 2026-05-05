@@ -87,4 +87,4 @@ if __name__ == "__main__":
         asyncio.run(main())
     except KeyboardInterrupt:
         # Captura de excepción Ctrl-C
-        print("\nmqtt final")
+        print("\n Saliendo del contenedor...")
