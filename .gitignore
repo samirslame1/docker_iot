@@ -1,0 +1,3 @@
+.env
+#docker-compose.yaml Esto seria lo ideal porque tengo las variables de entorno ahi, pero si lo hago no van a 
+#poder corregir correctamente asi que lo dejo comentado
