@@ -4,8 +4,35 @@ import os, logging
 from functools import wraps
 from werkzeug.middleware.proxy_fix import ProxyFix
 from werkzeug.security import check_password_hash, generate_password_hash
+import json
+import paho.mqtt.publish as publish
 
 logging.basicConfig(format='%(asctime)s - CRUD - %(levelname)s - %(message)s', level=logging.INFO)
+
+# Configuracion MQTT
+MQTT_HOST = "mosquitto"
+MQTT_PORT = 1883
+TOPICO_BASE = "pibeschorros"
+NODOS = ["pico1", "pico2", "pico3"]
+
+
+def publicar(nodo, subtopico, valor):
+    """Publica {"msg": valor} en pibeschorros/<nodo>/<subtopico>."""
+    payload = json.dumps({"msg": valor})
+    topico = f"{TOPICO_BASE}/{nodo}/{subtopico}"
+    try:
+        publish.single(
+            topic=topico,
+            payload=payload,
+            hostname=MQTT_HOST,
+            port=MQTT_PORT,
+            auth={"username": os.environ["MQTT_USR"], "password": os.environ["MQTT_PASS"]}
+        )
+        logging.info(f"Publicado {topico}: {payload}")
+        return True
+    except Exception as e:
+        logging.error(f"Error al publicar en {topico}: {e}")
+        return False
 
 app = Flask(__name__)
 
@@ -138,6 +165,34 @@ def actualizar_contacto(id):
         logging.info("se actualizó un contacto")
         mysql.connection.commit()
     return redirect(url_for('index'))
+
+@app.route("/comandos", methods=["GET", "POST"])
+@require_login
+def comandos():
+    if request.method == "POST":
+        nodo = request.form.get("nodo")
+        comando = request.form.get("comando")
+
+        if nodo not in NODOS:
+            flash("Nodo invalido")
+            return redirect(url_for("comandos"))
+
+        if comando == "destello":
+            if publicar(nodo, "destello", "on"):
+                flash(f"Destello enviado a {nodo}")
+            else:
+                flash("Error al enviar el comando")
+        elif comando == "setpoint":
+            valor = request.form.get("setpoint", "")
+            if not valor.isdigit():
+                flash("El setpoint debe ser un numero")
+            elif publicar(nodo, "setpoint", valor):
+                flash(f"Setpoint {valor} enviado a {nodo}")
+            else:
+                flash("Error al enviar el comando")
+        return redirect(url_for("comandos"))
+
+    return render_template("comandos.html", nodos=NODOS)
 
 @app.route("/logout")
 @require_login

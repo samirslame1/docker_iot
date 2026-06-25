@@ -1,0 +1,59 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="row">
+  <div class="col-md-7 mx-auto">
+    <div class="card card-body">
+      <legend>Enviar comandos a los nodos</legend>
+
+      <form action="{{ url_for('comandos') }}" method="POST">
+
+        <label class="form-label mt-3">Nodo destinatario</label>
+
+        <!-- Lista desplegable -->
+        <select name="nodo" id="nodo" class="form-select mb-3">
+          {% for n in nodos %}
+          <option value="{{ n }}">{{ n }}</option>
+          {% endfor %}
+        </select>
+
+        <!-- Radio buttons (sincronizados con el desplegable por JS) -->
+        <div class="mb-3">
+          {% for n in nodos %}
+          <div class="form-check form-check-inline">
+            <input class="form-check-input radio-nodo" type="radio" name="nodo_radio" value="{{ n }}"
+              {% if loop.first %}checked{% endif %}>
+            <label class="form-check-label">{{ n }}</label>
+          </div>
+          {% endfor %}
+        </div>
+
+        <hr>
+
+        <div class="mb-3">
+          <label class="form-label">Setpoint</label>
+          <input type="number" name="setpoint" class="form-control" placeholder="Ej: 25">
+        </div>
+
+        <div class="d-flex gap-2">
+          <button type="submit" name="comando" value="destello" class="btn btn-warning">Destello</button>
+          <button type="submit" name="comando" value="setpoint" class="btn btn-primary">Enviar setpoint</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Mantener sincronizados el desplegable y los radio buttons
+  const select = document.getElementById("nodo");
+  const radios = document.querySelectorAll(".radio-nodo");
+
+  select.addEventListener("change", () => {
+    radios.forEach(r => r.checked = (r.value === select.value));
+  });
+
+  radios.forEach(r => r.addEventListener("change", () => {
+    if (r.checked) select.value = r.value;
+  }));
+</script>
+{% endblock %}
