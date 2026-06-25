@@ -139,6 +139,14 @@ def actualizar_contacto(id):
         mysql.connection.commit()
     return redirect(url_for('index'))
 
+@app.route("/set_tema", methods=["POST"])
+@require_login
+def set_tema():
+    tema = request.form.get("tema", "claro")
+    if tema in ("claro", "oscuro"):
+        session["tema"] = tema
+    return redirect(request.referrer or url_for('index'))
+
 @app.route("/logout")
 @require_login
 def logout():

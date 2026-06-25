@@ -4,8 +4,11 @@
 <head>
   <meta charset="UTF-8" />
   <title>FLASK CRUD 1.6</title>
-  <!-- <link rel="stylesheet" href="https://bootswatch.com/5/cosmo/bootstrap.min.css"> -->
+  {% if session.get('tema') == 'oscuro' %}
   <link rel="stylesheet" href="https://bootswatch.com/5/darkly/bootstrap.min.css">
+  {% else %}
+  <link rel="stylesheet" href="https://bootswatch.com/5/cosmo/bootstrap.min.css">
+  {% endif %}
   {% with messages = get_flashed_messages() %} {% if messages %}
   {% for message in messages %}
   <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -18,9 +21,15 @@
     <div class="container-fluid">
       <a class="navbar-brand" href="#">CRUD</a>
       {% if session.get("user_id") %}
-      <div class="d-flex">
-        <div class="nav-item pe-3 pt-2">{{ session.get("user_id") }}</div>
-        <a href="{{url_for('logout')}}" class="btn btn-secondary my-2 my-sm-0" type="submit">Salir</a>
+      <div class="d-flex align-items-center gap-2">
+        <div class="nav-item pt-2">{{ session.get("user_id") }}</div>
+        <form action="{{ url_for('set_tema') }}" method="post">
+          <select name="tema" class="form-select form-select-sm" onchange="this.form.submit()">
+            <option value="claro" {% if session.get('tema', 'claro') == 'claro' %}selected{% endif %}>☀️ Claro</option>
+            <option value="oscuro" {% if session.get('tema', 'claro') == 'oscuro' %}selected{% endif %}>🌙 Oscuro</option>
+          </select>
+        </form>
+        <a href="{{url_for('logout')}}" class="btn btn-secondary my-2 my-sm-0">Salir</a>
       </div>
       {% endif %}
     </div>
